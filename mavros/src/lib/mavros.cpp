@@ -233,7 +233,7 @@ void MavRos::mavlink_pub_cb(const mavlink_message_t *mmsg, Framing framing)
 {
 	auto rmsg = boost::make_shared<mavros_msgs::Mavlink>();
 
-	if  (mavlink_pub.getNumSubscribers() == 0)
+	if  (mavlink_pub.getNumSubscribers() == 0 || mmsg->sysid != mav_uas.get_tgt_system())
 		return;
 
 	rmsg->header.stamp = ros::Time::now();
@@ -254,7 +254,7 @@ void MavRos::mavlink_sub_cb(const mavros_msgs::Mavlink::ConstPtr &rmsg)
 void MavRos::plugin_route_cb(const mavlink_message_t *mmsg, const Framing framing)
 {
 	auto it = plugin_subscriptions.find(mmsg->msgid);
-	if (it == plugin_subscriptions.end())
+	if (it == plugin_subscriptions.end() || mmsg->sysid != mav_uas.get_tgt_system())
 		return;
 
 	for (auto &info : it->second)
